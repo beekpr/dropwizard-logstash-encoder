@@ -1,0 +1,51 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+group = GROUP
+version = VERSION
+
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+ext {
+    marketplaceRepositoryUrl = System.getenv('MVN_S3_URL')
+    marketplaceRepositoryAccessKey = System.getenv('MVN_S3_ACCESS_KEY')
+    marketplaceRepositorySecretKey = System.getenv('MVN_S3_SECRET_KEY')
+}
+
+dependencies {
+    compile 'com.fasterxml.jackson.core:jackson-core:2.4.0'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.4.0'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.4.0'
+
+    compile 'io.dropwizard:dropwizard-logging:1.0.2'
+    compile 'net.logstash.logback:logstash-logback-encoder:4.7'
+}
+
+publishing {
+    repositories {
+        maven {
+            url rootProject.ext.marketplaceRepositoryUrl
+            credentials(AwsCredentials) {
+                accessKey rootProject.ext.marketplaceRepositoryAccessKey
+                secretKey rootProject.ext.marketplaceRepositorySecretKey
+            }
+        }
+    }
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.0'
+}
