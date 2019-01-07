@@ -15,9 +15,13 @@ repositories {
 }
 
 ext {
-    marketplaceRepositoryUrl = System.getenv('MVN_S3_URL')
-    marketplaceRepositoryAccessKey = System.getenv('MVN_S3_ACCESS_KEY')
-    marketplaceRepositorySecretKey = System.getenv('MVN_S3_SECRET_KEY')
+    marketplaceRepositoryUrl = System.env['MVN_S3_MARKETPLACE_URL']
+    marketplaceRepositoryAccessKey = System.env['MVN_S3_MARKETPLACE_ACCESS_KEY']
+    marketplaceRepositorySecretKey = System.env['MVN_S3_MARKETPLACE_SECRET_KEY']
+
+    internalRepositoryUrl = System.env['MVN_S3_INTERNAL_URL']
+    internalRepositoryAccessKey= System.env['MVN_S3_INTERNAL_ACCESS_KEY']
+    internalRepositorySecretKey = System.env['MVN_S3_INTERNAL_SECRET_KEY']
 }
 
 dependencies {
@@ -31,6 +35,13 @@ dependencies {
 
 publishing {
     repositories {
+        maven {
+            url rootProject.ext.internalRepositoryUrl
+            credentials(AwsCredentials) {
+                accessKey rootProject.ext.internalRepositoryAccessKey
+                secretKey rootProject.ext.internalRepositorySecretKey
+            }
+        }
         maven {
             url rootProject.ext.marketplaceRepositoryUrl
             credentials(AwsCredentials) {
